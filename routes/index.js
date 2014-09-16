@@ -82,10 +82,19 @@ module.exports = function(app, useCors) {
         rasterizerService.restartService();
         return callback(new Error(body));
       }
+        var inImagePath = rasterizerService.getPath() + rasterizerOptions.headers.filename;
+        var outImagePath = rasterizerService.getPath() + rasterizerOptions.headers.filename;
+        var gravity = "north";
+        if(!fs.existsSync(inImagePath)) {
+            console.log('Image not found. Returning no preview image.');
+            inImagePath = 'public/no-pre.png'
+            gravity = "center";
+        }
+
         console.log('Converting to thumbnail');
-        exec("convert " + rasterizerService.getPath() + rasterizerOptions.headers.filename + " -filter Lanczos -thumbnail " + rasterizerOptions.headers.width + "x" + rasterizerOptions.headers.height + "^ -gravity north -extent " + rasterizerOptions.headers.width + "x" + rasterizerOptions.headers.height + " -unsharp 0x.5 " + rasterizerService.getPath() + rasterizerOptions.headers.filename, function(error, stdout, stderr) {
+        exec("convert " + inImagePath + " -filter Lanczos -thumbnail " + rasterizerOptions.headers.width + "x" + rasterizerOptions.headers.height + "^ -gravity " + gravity + " -extent " + rasterizerOptions.headers.width + "x" + rasterizerOptions.headers.height + " -unsharp 0x.5 " + outImagePath, function(error, stdout, stderr) {
             console.log('Optimizing PNG');
-            exec('optipng ' + rasterizerService.getPath() + rasterizerOptions.headers.filename, function(error, stdout, stderr) {
+            exec('optipng ' + outImagePath, function(error, stdout, stderr) {
                 callback(null);
             });
         });
@@ -114,10 +123,10 @@ module.exports = function(app, useCors) {
       res.setHeader("Access-Control-Allow-Origin", "*");
       res.setHeader("Access-Control-Expose-Headers", "Content-Type");
     }
-    res.sendfile(imagePath, function(err) {
-      fileCleanerService.addFile(imagePath);
-      callback(err);
-    });
+      res.sendfile(imagePath, function(err) {
+          fileCleanerService.addFile(imagePath);
+          callback(err);
+      });
   }
 
 };

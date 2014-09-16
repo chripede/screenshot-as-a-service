@@ -3,6 +3,7 @@ var join = require('path').join;
 var fs = require('fs');
 var path = require('path');
 var request = require('request');
+var exec = require('child_process').exec;
 
 module.exports = function(app, useCors) {
   var rasterizerService = app.settings.rasterizerService;
@@ -81,7 +82,13 @@ module.exports = function(app, useCors) {
         rasterizerService.restartService();
         return callback(new Error(body));
       }
-      callback(null);
+        console.log('Converting to thumbnail');
+        exec("convert " + rasterizerService.getPath() + rasterizerOptions.headers.filename + " -filter Lanczos -thumbnail 66x50^ -gravity north -extent 66x50 -unsharp 0x.5 " + rasterizerService.getPath() + rasterizerOptions.headers.filename, function(error, stdout, stderr) {
+            console.log('Optimizing PNG');
+            exec('optipng ' + rasterizerService.getPath() + rasterizerOptions.headers.filename, function(error, stdout, stderr) {
+                callback(null);
+            });
+        });
     });
   }
 

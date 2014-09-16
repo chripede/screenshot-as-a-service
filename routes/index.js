@@ -83,7 +83,7 @@ module.exports = function(app, useCors) {
         return callback(new Error(body));
       }
         console.log('Converting to thumbnail');
-        exec("convert " + rasterizerService.getPath() + rasterizerOptions.headers.filename + " -filter Lanczos -thumbnail 66x50^ -gravity north -extent 66x50 -unsharp 0x.5 " + rasterizerService.getPath() + rasterizerOptions.headers.filename, function(error, stdout, stderr) {
+        exec("convert " + rasterizerService.getPath() + rasterizerOptions.headers.filename + " -filter Lanczos -thumbnail " + rasterizerOptions.headers.width + "x" + rasterizerOptions.headers.height + "^ -gravity north -extent " + rasterizerOptions.headers.width + "x" + rasterizerOptions.headers.height + " -unsharp 0x.5 " + rasterizerService.getPath() + rasterizerOptions.headers.filename, function(error, stdout, stderr) {
             console.log('Optimizing PNG');
             exec('optipng ' + rasterizerService.getPath() + rasterizerOptions.headers.filename, function(error, stdout, stderr) {
                 callback(null);

@@ -69,8 +69,8 @@ service = server.listen(port, function(request, response) {
   var delay = request.headers.delay || 0;
   try {
     page.viewportSize = {
-      width: request.headers.width || defaultViewportSize.width,
-      height: request.headers.height || defaultViewportSize.height
+      width: defaultViewportSize.width,
+      height: defaultViewportSize.height
     };
     if (request.headers.clipRect) {
       page.clipRect = JSON.parse(request.headers.clipRect);

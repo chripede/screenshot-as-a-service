@@ -159,17 +159,17 @@ module.exports = function(app, useCors) {
             var isIco = false;
 
             var iconFileUrl = response.body;
-            if(/ico$/.test(iconFileUrl.toLowerCase())) {
-                isIco = true;
-                inImagePath += ".ico";
-            }
-
-            if(iconFileUrl.indexOf("http") != 0) {
+            if(iconFileUrl === undefined || iconFileUrl.indexOf("http") != 0) {
                 inImagePath = 'public/no-favicon.png'
                 fs.createReadStream(inImagePath).pipe(fs.createWriteStream(outImagePath)).on('close', function() {
                     callback(null);
                 });
                 return;
+            }
+
+            if(/ico$/.test(iconFileUrl.toLowerCase())) {
+                isIco = true;
+                inImagePath += ".ico";
             }
 
             console.log("Downloading " + iconFileUrl);

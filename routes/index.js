@@ -178,8 +178,8 @@ module.exports = function(app, useCors) {
                     var isError = true;
                 }
 
-                request(iconFileUrl).pipe(fs.createWriteStream(inImagePath)).on('close', function() {
-                    if(isError) {
+                var f = request(iconFileUrl).pipe(fs.createWriteStream(inImagePath)).on('close', function() {
+                    if(isError || f.bytesWritten === 0) {
                         console.log('Image not found. Returning no preview image.');
                         fs.unlinkSync(inImagePath);
                         inImagePath = 'public/no-favicon.png'

@@ -228,7 +228,7 @@ module.exports = function(app, useCors) {
         }
         res.setHeader("Cache-Control", "public, max-age=" + (604800 + Math.floor((Math.random() * 604800) + 1)));
         res.sendfile(imagePath, function(err) {
-            fileCleanerService.addFile(imagePath);
+            // fileCleanerService.addFile(imagePath);
             callback(err);
         });
     };

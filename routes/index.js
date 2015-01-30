@@ -176,13 +176,14 @@ module.exports = function(app, useCors) {
             request.get(iconFileUrl, function(error, response, body) {
                 if(error || response.statusCode != 200) {
                     var isError = true;
+                    iconFileUrl = 'http://example.com/no-favicon.png'; // hack!
                 }
 
                 var f = request(iconFileUrl).pipe(fs.createWriteStream(inImagePath)).on('close', function() {
                     if(isError || f.bytesWritten === 0) {
                         console.log('Image not found. Returning no preview image.');
                         fs.unlinkSync(inImagePath);
-                        inImagePath = 'public/no-favicon.png'
+                        inImagePath = 'public/no-favicon.png';
                         isIco = false;
                     }
 
@@ -191,7 +192,7 @@ module.exports = function(app, useCors) {
                         if(stdout.indexOf('image') !== 0) {
                             console.log("Not an image!");
                             fs.unlinkSync(inImagePath);
-                            inImagePath = 'public/no-favicon.png'
+                            inImagePath = 'public/no-favicon.png';
                             isIco = false;
                         }
 

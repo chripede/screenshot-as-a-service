@@ -186,16 +186,27 @@ module.exports = function(app, useCors) {
                         isIco = false;
                     }
 
-                    console.log('Converting to thumbnail');
-                    var convertImagePath = inImagePath + (isIco ? "[-1]": "");
-                    exec("convert \"" + convertImagePath + "\" -filter Lanczos -thumbnail " + rasterizerOptions.headers.width + "x" + rasterizerOptions.headers.height + "^ -unsharp 0x.5 " + outImagePath, function(error, stdout, stderr) {
-                        if(isIco) {
-                            console.log('Removing ico file');
+                    // Check that file is an image
+                    exec("file -i -b " + inImagePath, function(error, stdout, stderr) {
+                        if(stdout.indexOf('image') !== 0) {
+                            console.log("Not an image!");
                             fs.unlinkSync(inImagePath);
+                            inImagePath = 'public/no-favicon.png'
+                            isIco = false;
                         }
-                        console.log('Optimizing PNG');
-                        exec('optipng ' + outImagePath, function(error, stdout, stderr) {
-                            callback(null);
+
+                        console.log('Converting to thumbnail');
+                        var convertImagePath = inImagePath + (isIco ? "[-1]": "");
+                        console.log(convertImagePath)
+                        exec("convert \"" + convertImagePath + "\" -filter Lanczos -thumbnail " + rasterizerOptions.headers.width + "x" + rasterizerOptions.headers.height + "^ -unsharp 0x.5 " + outImagePath, function(error, stdout, stderr) {
+                            if(isIco) {
+                                console.log('Removing ico file');
+                                fs.unlinkSync(inImagePath);
+                            }
+                            console.log('Optimizing PNG');
+                            exec('optipng ' + outImagePath, function(error, stdout, stderr) {
+                                callback(null);
+                            });
                         });
                     });
                 });

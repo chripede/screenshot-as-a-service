@@ -67,7 +67,10 @@ module.exports = function(app, useCors) {
             return;
         }
         console.log('Request for %s - Getting favicon', url);
-        processFaviconUsingPhantom(options, filePath, res, callbackUrl, function(err) { if(err) next(err); });
+        processFaviconUsingPhantom(options, filePath, res, callbackUrl, function(err) {
+            console.log(err);
+            if(err) next(err);
+        });
     });
 
     app.get('*', function(req, res, next) {
@@ -138,7 +141,7 @@ module.exports = function(app, useCors) {
             }
 
             console.log('Converting to thumbnail');
-            exec("convert " + inImagePath + " -filter Lanczos -thumbnail " + rasterizerOptions.headers.width + "x" + rasterizerOptions.headers.height + "^ -gravity " + gravity + " -extent " + rasterizerOptions.headers.width + "x" + rasterizerOptions.headers.height + " -unsharp 0x.5 " + outImagePath, function(error, stdout, stderr) {
+            exec("convert " + inImagePath + " -filter Lanczos -thumbnail " + rasterizerOptions.headers.width + "x" + rasterizerOptions.headers.height + "^ -gravity " + gravity + " -extent " + rasterizerOptions.headers.width + "x" + rasterizerOptions.headers.height + " -unsharp 0x.5 -flatten " + outImagePath, function(error, stdout, stderr) {
                 console.log('Optimizing PNG');
                 exec('optipng ' + outImagePath, function(error, stdout, stderr) {
                     callback(null);

@@ -6,11 +6,12 @@
  *
  * This starts an HTTP server waiting for screenshot requests
  */
-var basePath = phantom.args[0] || '/tmp/';
+var system = require('system');
 
-var port  = phantom.args[1] || 3002;
+var basePath = system.args[1] || '/tmp/';
+var port  = system.args[2] || 3002;
 
-var defaultViewportSize = phantom.args[2] || '';
+var defaultViewportSize = system.args[3] || '';
 defaultViewportSize = defaultViewportSize.split('x');
 defaultViewportSize = {
     width: ~~defaultViewportSize[0] || 1024,
@@ -63,10 +64,11 @@ service = server.listen(port, function(request, response) {
         response.close();
         return;
     }
-    var url = request.headers.url;
+    //var url = request.headers.url;
+    var url = "https://www.accuranker.com/";
     var path = basePath + (request.headers.filename || (url.replace(new RegExp('https?://'), '').replace(/\//g, '.') + '.png'));
     var page = new WebPage();
-    var delay = request.headers.delay || 0;
+    var delay = request.headers.delay || 5000;
     try {
         page.viewportSize = {
             width: defaultViewportSize.width,
@@ -86,12 +88,28 @@ service = server.listen(port, function(request, response) {
         response.write('Error while parsing headers: ' + err.message);
         return response.close();
     }
+    page.onConsoleMessage = function(msg) {
+        console.log(msg);
+    };
     page.open(url, function(status) {
+        console.log("Delay: " + delay);
+        console.log("URL:" + url);
+        console.log("Status: " + status);
+
         if (status == 'success') {
             window.setTimeout(function () {
-
                 var favicon = page.evaluate(function() {
-                    var docHead = document.querySelector("html > head"), favIcon = docHead.querySelector('link[href][rel="shortcut icon"], link[href][rel="apple-touch-icon"], link[href][rel="icon"]');
+                    var docHead = document.querySelector("html > head");
+                    var favIcon = null;
+
+                    favIcon = docHead.querySelector('link[href][rel="apple-touch-icon"]');
+                    if (!favIcon) {
+                        favIcon = docHead.querySelector('link[href][rel="icon"]');
+                    }
+                    if(!favIcon) {
+                        favIcon = docHead.querySelector('link[href][rel="shortcut icon"]');
+                    }
+
                     if(favIcon) {
                         return favIcon.href;
                     } else {
@@ -104,6 +122,7 @@ service = server.listen(port, function(request, response) {
                 response.close();
             }, delay);
         } else {
+            console.log("Error");
             response.write('Error: Url returned status ' + status + "\n");
             page.release();
             response.close();

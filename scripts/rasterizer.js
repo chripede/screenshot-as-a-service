@@ -6,11 +6,12 @@
  *
  * This starts an HTTP server waiting for screenshot requests
  */
-var basePath = phantom.args[0] || '/tmp/'; 
+var system = require('system');
 
-var port  = phantom.args[1] || 3001;
+var basePath = system.args[1] || '/tmp/'; 
+var port  = system.args[2] || 3001;
 
-var defaultViewportSize = phantom.args[2] || '';
+var defaultViewportSize = system.args[3] || '';
 defaultViewportSize = defaultViewportSize.split('x');
 defaultViewportSize = {
   width: ~~defaultViewportSize[0] || 1024,
@@ -66,7 +67,7 @@ service = server.listen(port, function(request, response) {
   var url = request.headers.url;
   var path = basePath + (request.headers.filename || (url.replace(new RegExp('https?://'), '').replace(/\//g, '.') + '.png'));
   var page = new WebPage();
-  var delay = request.headers.delay || 0;
+  var delay = request.headers.delay || 5000;
   try {
     page.viewportSize = {
       width: defaultViewportSize.width,
@@ -75,6 +76,7 @@ service = server.listen(port, function(request, response) {
     if (request.headers.clipRect) {
       page.clipRect = JSON.parse(request.headers.clipRect);
     }
+    page.settings.userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.98 Safari/537.36';
     for (name in pageSettings) {
       if (value = request.headers[pageSettings[name]]) {
         value = (value == 'false') ? false : ((value == 'true') ? true : value);

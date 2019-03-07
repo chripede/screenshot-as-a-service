@@ -92,9 +92,9 @@ service = server.listen(port, function(request, response) {
         console.log(msg);
     };
     page.open(url, function(status) {
-        console.log("Delay: " + delay);
-        console.log("URL:" + url);
-        console.log("Status: " + status);
+//        console.log("Delay: " + delay);
+//        console.log("URL:" + url);
+//        console.log("Status: " + status);
 
         if (status == 'success') {
             window.setTimeout(function () {
@@ -116,7 +116,6 @@ service = server.listen(port, function(request, response) {
                         return location.origin + "/favicon.ico";
                     }
                 });
-                console.log(favicon);
                 response.write(favicon);
                 page.release();
                 response.close();

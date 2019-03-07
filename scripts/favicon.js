@@ -64,8 +64,7 @@ service = server.listen(port, function(request, response) {
         response.close();
         return;
     }
-    //var url = request.headers.url;
-    var url = "https://www.accuranker.com/";
+    var url = request.headers.url;
     var path = basePath + (request.headers.filename || (url.replace(new RegExp('https?://'), '').replace(/\//g, '.') + '.png'));
     var page = new WebPage();
     var delay = request.headers.delay || 5000;
